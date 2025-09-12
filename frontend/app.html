@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choroid Authentication System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-container {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .loading-subtext {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Checking Authentication...</div>
+        <div class="loading-subtext">Please wait while we verify your session</div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api/auth';
+
+        // Check authentication status on page load
+        window.addEventListener('DOMContentLoaded', async function() {
+            await checkAuthenticationStatus();
+        });
+
+        async function checkAuthenticationStatus() {
+            try {
+                // Check if we have a stored JWT token
+                const token = localStorage.getItem('jwt_token');
+                const username = localStorage.getItem('username');
+
+                if (!token || !username) {
+                    console.log('No stored credentials found, redirecting to login');
+                    redirectToLogin();
+                    return;
+                }
+
+                // Validate the token with the server
+                const isValid = await validateTokenWithServer(token);
+                
+                if (isValid) {
+                    console.log('Valid token found, redirecting to dashboard');
+                    redirectToDashboard(username, token);
+                } else {
+                    console.log('Invalid token, clearing storage and redirecting to login');
+                    clearStoredAuth();
+                    redirectToLogin();
+                }
+
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+                clearStoredAuth();
+                redirectToLogin();
+            }
+        }
+
+        async function validateTokenWithServer(token) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/validate?token=${encodeURIComponent(token)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.valid === true;
+                }
+                
+                return false;
+            } catch (error) {
+                console.error('Token validation failed:', error);
+                return false;
+            }
+        }
+
+        function redirectToLogin() {
+            // Add a small delay for better UX
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000);
+        }
+
+        function redirectToDashboard(username, token) {
+            // Store the validated credentials for the dashboard
+            localStorage.setItem('jwt_token', token);
+            localStorage.setItem('username', username);
+            
+            // Add a small delay for better UX
+            setTimeout(() => {
+                window.location.href = `dashboard.html?user=${encodeURIComponent(username)}`;
+            }, 1000);
+        }
+
+        function clearStoredAuth() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('refresh_token');
+        }
+    </script>
+</body>
+</html>

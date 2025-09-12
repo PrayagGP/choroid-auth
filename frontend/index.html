@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choroid Authentication Service - Test Frontend</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .response-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .response-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .response-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .success {
+            border-left: 4px solid #28a745;
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .warning {
+            border-left: 4px solid #ffc107;
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .info {
+            border-left: 4px solid #17a2b8;
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .token-display {
+            margin-top: 15px;
+        }
+
+        .token-display h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .token-display textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        .test-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .btn-test {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-test:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background-color: #28a745;
+            box-shadow: 0 0 5px #28a745;
+        }
+
+        .status-offline {
+            background-color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Choroid Authentication Service</h1>
+            <p>Test Frontend for Manual Authentication Testing</p>
+            <div>
+                <span id="service-status" class="status-indicator status-offline"></span>
+                <span id="service-text">Checking service status...</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Login Section -->
+            <div class="card">
+                <h2>🔑 Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Username:</label>
+                        <input type="text" id="loginUsername" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password:</label>
+                        <input type="password" id="loginPassword" name="password" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </div>
+
+            <!-- Signup Section -->
+            <div class="card">
+                <h2>📝 Sign Up</h2>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="signupUsername">Username:</label>
+                        <input type="text" id="signupUsername" name="username" placeholder="Choose username (3-50 chars)" required minlength="3" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password:</label>
+                        <input type="password" id="signupPassword" name="password" placeholder="Choose password (min 6 chars)" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Sign Up</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Response Section -->
+        <div class="response-section">
+            <h2>📋 Response Log</h2>
+            <div id="responseLog" class="response-box">
+                Ready to test authentication service...\n
+                Tip: Try logging in with existing users or creating new ones!
+            </div>
+            <div class="token-display" id="tokenDisplay" style="display: none;">
+                <h4>🎫 Access Token:</h4>
+                <textarea id="accessToken" readonly placeholder="JWT Access Token will appear here..."></textarea>
+                <h4>🔄 Refresh Token:</h4>
+                <textarea id="refreshToken" readonly placeholder="JWT Refresh Token will appear here..."></textarea>
+            </div>
+        </div>
+
+        <!-- Quick Test Section -->
+        <div class="test-section">
+            <div class="test-card">
+                <h3>🧪 Quick Tests</h3>
+                <button class="btn-test" style="background: #17a2b8; color: white;" onclick="checkHealth()">Check Service Health</button>
+                <button class="btn-test" style="background: #28a745; color: white;" onclick="testValidToken()">Validate Current Token</button>
+                <button class="btn-test" style="background: #ffc107; color: black;" onclick="testInvalidCredentials()">Test Invalid Login</button>
+                <button class="btn-test" style="background: #dc3545; color: white;" onclick="testDuplicateUser()">Test Duplicate Signup</button>
+            </div>
+
+            <div class="test-card">
+                <h3>👥 Sample Users</h3>
+                <p><strong>Test Users (if they exist):</strong></p>
+                <ul>
+                    <li><code>admin</code> / <code>admin123</code></li>
+                    <li><code>testuser</code> / <code>password123</code></li>
+                </ul>
+                <button class="btn-test" style="background: #6f42c1; color: white;" onclick="loginAsAdmin()">Quick Login as Admin</button>
+                <button class="btn-test" style="background: #e83e8c; color: white;" onclick="loginAsTestUser()">Quick Login as TestUser</button>
+            </div>
+
+            <div class="test-card">
+                <h3>🔧 Utilities</h3>
+                <button class="btn-test" style="background: #6c757d; color: white;" onclick="clearLog()">Clear Log</button>
+                <button class="btn-test" style="background: #fd7e14; color: white;" onclick="clearTokens()">Clear Tokens</button>
+                <button class="btn-test" style="background: #20c997; color: white;" onclick="exportLog()">Export Log</button>
+                <button class="btn-test" style="background: #343a40; color: white;" onclick="showApiDocs()">API Documentation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api/auth';
+        let currentTokens = {
+            accessToken: null,
+            refreshToken: null,
+            username: null
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            checkHealth();
+            setupFormHandlers();
+        });
+
+        // Setup form event handlers
+        function setupFormHandlers() {
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('signupForm').addEventListener('submit', handleSignup);
+        }
+
+        // Check service health
+        async function checkHealth() {
+            try {
+                logMessage('🔍 Checking service health...', 'info');
+                const response = await fetch(`${API_BASE_URL}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('service-status').className = 'status-indicator status-online';
+                    document.getElementById('service-text').textContent = 'Service Online';
+                    logMessage('✅ Service is healthy and running!', 'success');
+                    logMessage(JSON.stringify(data, null, 2), 'info');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                document.getElementById('service-status').className = 'status-indicator status-offline';
+                document.getElementById('service-text').textContent = 'Service Offline';
+                logMessage('❌ Service health check failed: ' + error.message, 'error');
+            }
+        }
+
+        // Handle login form submission
+        async function handleLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const credentials = {
+                username: formData.get('username'),
+                password: formData.get('password')
+            };
+
+            await performLogin(credentials);
+        }
+
+        // Perform login request
+        async function performLogin(credentials) {
+            try {
+                logMessage(`🔑 Attempting login for user: ${credentials.username}`, 'info');
+                
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(credentials)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    logMessage('✅ Login successful!', 'success');
+                    logMessage(JSON.stringify(data, null, 2), 'success');
+                    
+                    // Store tokens
+                    currentTokens.accessToken = data.token;
+                    currentTokens.refreshToken = data.refreshToken;
+                    currentTokens.username = data.username;
+                    
+                    displayTokens();
+                    clearForm('loginForm');
+                } else {
+                    logMessage(`❌ Login failed: ${data.message || 'Unknown error'}`, 'error');
+                    logMessage(JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                logMessage('❌ Network error during login: ' + error.message, 'error');
+            }
+        }
+
+        // Handle signup form submission
+        async function handleSignup(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const userData = {
+                username: formData.get('username'),
+                password: formData.get('password')
+            };
+
+            await performSignup(userData);
+        }
+
+        // Perform signup request
+        async function performSignup(userData) {
+            try {
+                logMessage(`📝 Attempting signup for user: ${userData.username}`, 'info');
+                
+                const response = await fetch(`${API_BASE_URL}/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    logMessage('✅ Signup successful!', 'success');
+                    logMessage(JSON.stringify(data, null, 2), 'success');
+                    clearForm('signupForm');
+                } else {
+                    logMessage(`❌ Signup failed: ${data.message || 'Unknown error'}`, 'error');
+                    logMessage(JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                logMessage('❌ Network error during signup: ' + error.message, 'error');
+            }
+        }
+
+        // Test token validation
+        async function testValidToken() {
+            if (!currentTokens.accessToken) {
+                logMessage('⚠️ No access token available. Please login first.', 'warning');
+                return;
+            }
+
+            try {
+                logMessage('🎫 Testing token validation...', 'info');
+                
+                const response = await fetch(`${API_BASE_URL}/validate?token=${encodeURIComponent(currentTokens.accessToken)}`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    logMessage('✅ Token validation successful!', 'success');
+                    logMessage(JSON.stringify(data, null, 2), 'success');
+                } else {
+                    logMessage('❌ Token validation failed!', 'error');
+                    logMessage(JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                logMessage('❌ Error during token validation: ' + error.message, 'error');
+            }
+        }
+
+        // Test invalid credentials
+        async function testInvalidCredentials() {
+            const invalidCreds = {
+                username: 'nonexistentuser',
+                password: 'wrongpassword'
+            };
+            
+            logMessage('🧪 Testing invalid credentials...', 'info');
+            await performLogin(invalidCreds);
+        }
+
+        // Test duplicate user signup
+        async function testDuplicateUser() {
+            const duplicateUser = {
+                username: 'admin',
+                password: 'newpassword123'
+            };
+            
+            logMessage('🧪 Testing duplicate user signup...', 'info');
+            await performSignup(duplicateUser);
+        }
+
+        // Quick login functions
+        async function loginAsAdmin() {
+            await performLogin({ username: 'admin', password: 'admin123' });
+        }
+
+        async function loginAsTestUser() {
+            await performLogin({ username: 'testuser', password: 'password123' });
+        }
+
+        // Display tokens
+        function displayTokens() {
+            if (currentTokens.accessToken) {
+                document.getElementById('tokenDisplay').style.display = 'block';
+                document.getElementById('accessToken').value = currentTokens.accessToken;
+                document.getElementById('refreshToken').value = currentTokens.refreshToken || '';
+            }
+        }
+
+        // Clear tokens
+        function clearTokens() {
+            currentTokens = {
+                accessToken: null,
+                refreshToken: null,
+                username: null
+            };
+            document.getElementById('tokenDisplay').style.display = 'none';
+            document.getElementById('accessToken').value = '';
+            document.getElementById('refreshToken').value = '';
+            logMessage('🧹 Tokens cleared', 'info');
+        }
+
+        // Clear form
+        function clearForm(formId) {
+            document.getElementById(formId).reset();
+        }
+
+        // Log message to response area
+        function logMessage(message, type = 'info') {
+            const log = document.getElementById('responseLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            
+            log.textContent += logEntry;
+            log.className = `response-box ${type}`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Clear log
+        function clearLog() {
+            const log = document.getElementById('responseLog');
+            log.textContent = 'Log cleared.\n';
+            log.className = 'response-box';
+        }
+
+        // Export log
+        function exportLog() {
+            const log = document.getElementById('responseLog');
+            const blob = new Blob([log.textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `auth-test-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            logMessage('📄 Log exported successfully', 'success');
+        }
+
+        // Show API documentation
+        function showApiDocs() {
+            const docs = `
+🔗 API ENDPOINTS:
+
+POST /api/auth/signup
+- Body: {"username": "string", "password": "string"}
+- Response: 201 Created or 409 Conflict
+
+POST /api/auth/login  
+- Body: {"username": "string", "password": "string"}
+- Response: 200 OK with JWT tokens or 401 Unauthorized
+
+POST /api/auth/validate
+- Query: ?token=<jwt_token>
+- Response: 200 OK with validation result
+
+GET /api/auth/health
+- Response: 200 OK with service status
+
+📋 AUTHENTICATION FLOW:
+1. Sign up with new credentials
+2. Log in to get JWT tokens
+3. Use tokens for authenticated requests
+4. Validate tokens as needed
+
+🔒 SECURITY FEATURES:
+- BCrypt password hashing
+- JWT tokens with expiration
+- Input validation
+- CORS enabled
+- Error handling
+            `;
+            logMessage(docs, 'info');
+        }
+    </script>
+</body>
+</html>
