@@ -9,15 +9,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
+/**
+ * Authentication service for user login, registration, and token management
+ * Uses JDBC for database operations
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class AuthService {
     
     private final CredentialsRepository credentialsRepository;
