@@ -25,7 +25,7 @@ Update your environment variables or application.properties:
 # Use the HOST's Hamachi IP address
 spring.datasource.url=jdbc:mysql://25.36.98.227:3307/choroid_db
 spring.datasource.username=root
-spring.datasource.password=apdddbs19
+spring.datasource.password=[PROVIDED_BY_HOST]
 
 # Your application port (choose different ports for each team member)
 server.port=8082  # or 8083, 8084, etc.
@@ -72,7 +72,7 @@ If team members can't connect, you may need to allow Hamachi through Windows Fir
 | Database Port | `3307` |
 | Database Name | `choroid_db` |
 | Username | `root` |
-| Password | `apdddbs19` |
+| Password | `[PROVIDED_BY_HOST]` |
 | App Ports | 8081 (host), 8082+ (team members) |
 
 ---
@@ -93,12 +93,12 @@ curl http://25.36.98.227:8081/api/auth/health
 # Signup test (create a new user first)
 curl -X POST http://25.36.98.227:8081/api/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"testpass123"}'
+  -d '{"username":"testuser","password":"[EXAMPLE_PASSWORD]"}'
 
 # Login test
 curl -X POST http://25.36.98.227:8081/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"testpass123"}'
+  -d '{"username":"testuser","password":"[EXAMPLE_PASSWORD]"}'
 ```
 
 ---

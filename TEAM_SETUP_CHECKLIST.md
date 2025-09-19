@@ -21,14 +21,14 @@ Database Host: 25.36.98.227
 Database Port: 3307
 Database Name: choroid_db
 Database Username: root
-Database Password: apdddbs19
+Database Password: [PROVIDED_BY_HOST]
 ```
 
 ### 4. **Connection URL for Spring Boot**
 ```properties
 spring.datasource.url=jdbc:mysql://25.36.98.227:3307/choroid_db
 spring.datasource.username=root
-spring.datasource.password=apdddbs19
+spring.datasource.password=[PROVIDED_BY_HOST]
 ```
 
 ### 5. **API Base URL**
@@ -67,7 +67,7 @@ Here's a message you can copy-paste to your friends:
 **🔗 Connection Details:**
 - My Hamachi IP: `25.36.98.227`
 - Database URL: `jdbc:mysql://25.36.98.227:3307/choroid_db`
-- Username: `root` | Password: `apdddbs19`
+- Username: `root` | Password: `[PROVIDED_BY_HOST]`
 - Use server port: `808X` (not 8081, I'm using that)
 
 **📝 Test URLs:**
@@ -110,13 +110,13 @@ curl http://25.36.98.227:8081/api/auth/health
 # Database (connect to your MySQL)
 spring.datasource.url=jdbc:mysql://25.36.98.227:3307/choroid_db
 spring.datasource.username=root
-spring.datasource.password=apdddbs19
+spring.datasource.password=[PROVIDED_BY_HOST]
 
 # Their server port (different from yours)
 server.port=8082  # or 8083, 8084, etc.
 
 # Same JWT settings as yours
-security.jwt.secret-key=4d6f6e6b6579654f7574666974526f636b734d6f6e6b6579654f7574666974
+security.jwt.secret-key=[PROVIDED_BY_HOST]
 security.jwt.access-token-expiration=86400000
 security.jwt.refresh-token-expiration=604800000
 ```

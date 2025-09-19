@@ -102,8 +102,8 @@ If these users exist in your database, you can test with:
 
 | Username | Password | Purpose |
 |----------|----------|---------|
-| `admin` | `admin123` | Administrator testing |
-| `testuser` | `password123` | General user testing |
+| `admin` | `[ADMIN_PASSWORD]` | Administrator testing |
+| `testuser` | `[TEST_PASSWORD]` | General user testing |
 
 **Quick Login Buttons**: Use the purple and pink buttons for one-click testing.
 

@@ -39,7 +39,7 @@ cd choroid-auth-service
 # Start MySQL container
 docker run -d \
   --name my-mysql-db \
-  -e MYSQL_ROOT_PASSWORD=apdddbs19 \
+  -e MYSQL_ROOT_PASSWORD=[YOUR_DB_PASSWORD]
   -e MYSQL_DATABASE=choroid_db \
   -p 3307:3306 \
   -v mysql_data:/var/lib/mysql \
@@ -71,10 +71,10 @@ Set up environment variables (recommended for production):
 # Database Configuration (Docker MySQL)
 export DB_URL=jdbc:mysql://localhost:3307/choroid_db
 export DB_USERNAME=root
-export DB_PASSWORD=apdddbs19
+export DB_PASSWORD=[YOUR_DB_PASSWORD]
 
 # JWT Configuration (IMPORTANT: Change in production!)
-export JWT_SECRET=4d6f6e6b6579654f7574666974526f636b734d6f6e6b6579654f7574666974
+export JWT_SECRET=[YOUR_JWT_SECRET_256_BIT]
 export JWT_EXPIRATION=86400000
 export JWT_REFRESH_EXPIRATION=604800000
 
@@ -261,7 +261,7 @@ server.port=${SERVER_PORT:8081}
 # Database Configuration (JDBC)
 spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3307/choroid_db}
 spring.datasource.username=${DB_USERNAME:root}
-spring.datasource.password=${DB_PASSWORD:apdddbs19}
+spring.datasource.password=${DB_PASSWORD:[YOUR_DB_PASSWORD]}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # JWT Configuration
@@ -302,12 +302,12 @@ curl -X GET http://localhost:8081/api/auth/health
 # Register user
 curl -X POST http://localhost:8081/api/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123"}'
+  -d '{"username": "testuser", "password": "[YOUR_PASSWORD]"}'
 
 # Login
 curl -X POST http://localhost:8081/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123"}'
+  -d '{"username": "testuser", "password": "[YOUR_PASSWORD]"}'
 
 # Validate token
 curl -X POST "http://localhost:8081/api/auth/validate?token=YOUR_TOKEN_HERE"
@@ -352,8 +352,8 @@ python -m http.server 8000
 
 The schema includes test users for development:
 
-- **admin**: password `admin` (bcrypt hashed)
-- **testuser**: password `password` (bcrypt hashed)
+- **admin**: password `[BCRYPT_HASHED]` 
+- **testuser**: password `[BCRYPT_HASHED]`
 
 **Note**: Test users are automatically created via `schema.sql`
 

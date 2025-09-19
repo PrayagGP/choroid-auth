@@ -161,8 +161,8 @@ frontend/start-test-environment.bat
    ```
 
 ### **Demo Credentials**
-- **Username**: `admin` | **Password**: `admin123`
-- **Username**: `testuser` | **Password**: `password123`
+- **Username**: `admin` | **Password**: `[ADMIN_PASSWORD]`
+- **Username**: `testuser` | **Password**: `[TEST_PASSWORD]`
 
 ## 🔧 **Configuration**
 
