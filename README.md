@@ -9,7 +9,7 @@ A secure, modern Spring Boot microservice providing JWT-based authentication and
 - **Input Validation**: Comprehensive request validation with detailed error messages
 - **Modern Security**: Latest Spring Security 6+ with proper configuration
 - **Error Handling**: Global exception handling with structured error responses
-- **Database Integration**: JPA/Hibernate with MySQL support
+- **Database Integration**: JDBC with MySQL support (lightweight and performant)
 - **Logging**: Structured logging with SLF4J
 - **API Documentation**: RESTful API design with proper DTOs
 - **Environment Configuration**: Externalized configuration for different environments
@@ -17,9 +17,11 @@ A secure, modern Spring Boot microservice providing JWT-based authentication and
 ## 📋 Prerequisites
 
 - **Java 24**: OpenJDK or Oracle JDK 24+
-- **MySQL 8.0+**: Database server
-- **Maven/Gradle**: Build tool (Gradle included)
+- **Docker**: For MySQL database (recommended)
+- **MySQL 8.0+**: Database server (Docker or local install)
+- **Gradle**: Build tool (wrapper included)
 - **Git**: Version control
+- **Hamachi VPN** (for team collaboration): Download from https://www.vpn.net/
 
 ## 🛠️ Installation & Setup
 
@@ -30,21 +32,34 @@ git clone <your-repo-url>
 cd choroid-auth-service
 ```
 
-### 2. Database Setup
+### 2. Database Setup (Docker - Recommended)
 
-Create a MySQL database and user:
+**Option A: Docker MySQL (Recommended)**
+```bash
+# Start MySQL container
+docker run -d \
+  --name my-mysql-db \
+  -e MYSQL_ROOT_PASSWORD=apdddbs19 \
+  -e MYSQL_DATABASE=choroid_db \
+  -p 3307:3306 \
+  -v mysql_data:/var/lib/mysql \
+  -v $(pwd)/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql \
+  mysql:8.0
+```
 
+**Option B: Docker Compose**
+```bash
+# Use the provided docker-compose file
+docker-compose -f docker-compose-mysql.yml up -d
+```
+
+**Option C: Local MySQL Installation**
 ```sql
 -- Create database
-CREATE DATABASE choroid_auth_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE choroid_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Create user
-CREATE USER 'choroid_user'@'localhost' IDENTIFIED BY 'S3cureP@ssw0rd!';
-GRANT ALL PRIVILEGES ON choroid_auth_db.* TO 'choroid_user'@'localhost';
-FLUSH PRIVILEGES;
-
--- Run the schema (optional - JPA will auto-create)
-USE choroid_auth_db;
+-- Import schema
+USE choroid_db;
 SOURCE src/main/resources/schema.sql;
 ```
 
@@ -53,18 +68,18 @@ SOURCE src/main/resources/schema.sql;
 Set up environment variables (recommended for production):
 
 ```bash
-# Database Configuration
-export DB_URL=jdbc:mysql://localhost:3306/choroid_auth_db
-export DB_USERNAME=choroid_user
-export DB_PASSWORD=S3cureP@ssw0rd!
+# Database Configuration (Docker MySQL)
+export DB_URL=jdbc:mysql://localhost:3307/choroid_db
+export DB_USERNAME=root
+export DB_PASSWORD=apdddbs19
 
 # JWT Configuration (IMPORTANT: Change in production!)
-export JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-make-it-at-least-32-chars
+export JWT_SECRET=4d6f6e6b6579654f7574666974526f636b734d6f6e6b6579654f7574666974
 export JWT_EXPIRATION=86400000
 export JWT_REFRESH_EXPIRATION=604800000
 
 # Server Configuration
-export SERVER_PORT=8080
+export SERVER_PORT=8081
 ```
 
 ### 4. Build & Run
@@ -80,9 +95,45 @@ export SERVER_PORT=8080
 java -jar build/libs/choroid-auth-service-0.0.1-SNAPSHOT.jar
 ```
 
-The service will start on `http://localhost:8080`
+The service will start on `http://localhost:8081`
 
-## 📚 API Documentation
+## 🤝 Team Collaboration Setup
+
+This project supports secure team development using **Hamachi VPN** for database sharing.
+
+### For Team Members (Remote Access)
+
+1. **Install Hamachi VPN**: Download from https://www.vpn.net/
+2. **Join the team network**: `choroid-ddbs-team`
+3. **Get connection details** from the host
+4. **Update your configuration** to connect to the host's database
+
+### Quick Team Setup
+
+**Host (Database Server)**:
+- Creates Hamachi network: `choroid-ddbs-team`
+- Runs MySQL container on port 3307
+- Shares Hamachi IP with team
+
+**Team Members**:
+- Join Hamachi network
+- Update database URL: `jdbc:mysql://[HOST_HAMACHI_IP]:3307/choroid_db`
+- Use different server ports: 8082, 8083, etc.
+
+### Documentation Files
+
+- 📝 **`VPN_SETUP_GUIDE.md`** - Complete VPN setup instructions
+- 📋 **`TEAM_SETUP_CHECKLIST.md`** - Connection details and checklist
+- 🔍 **`docker-compose-mysql.yml`** - Alternative Docker setup
+
+### Security Benefits
+
+- ✅ **No port forwarding** required
+- ✅ **Encrypted VPN tunnel**
+- ✅ **Database not exposed** to public internet
+- ✅ **Access control** via VPN network membership
+
+## 📋 API Documentation
 
 ### Authentication Endpoints
 
@@ -205,12 +256,13 @@ The service uses environment variables for configuration. Default values are pro
 ```properties
 # Application Configuration
 spring.application.name=Choroid-Authentication-and-Authorization-Service
-server.port=${SERVER_PORT:8080}
+server.port=${SERVER_PORT:8081}
 
-# Database Configuration
-spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/choroid_auth_db}
-spring.datasource.username=${DB_USERNAME:choroid_user}
-spring.datasource.password=${DB_PASSWORD:S3cureP@ssw0rd!}
+# Database Configuration (JDBC)
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3307/choroid_db}
+spring.datasource.username=${DB_USERNAME:root}
+spring.datasource.password=${DB_PASSWORD:apdddbs19}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # JWT Configuration
 jwt.secret=${JWT_SECRET:your-256-bit-secret-key-here-change-this-in-production}
@@ -245,21 +297,43 @@ jwt.refresh-expiration=${JWT_REFRESH_EXPIRATION:604800000}
 
 ```bash
 # Health check
-curl -X GET http://localhost:8080/api/auth/health
+curl -X GET http://localhost:8081/api/auth/health
 
 # Register user
-curl -X POST http://localhost:8080/api/auth/signup \
+curl -X POST http://localhost:8081/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"username": "testuser", "password": "password123"}'
 
 # Login
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8081/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username": "testuser", "password": "password123"}'
 
 # Validate token
-curl -X POST "http://localhost:8080/api/auth/validate?token=YOUR_TOKEN_HERE"
+curl -X POST "http://localhost:8081/api/auth/validate?token=YOUR_TOKEN_HERE"
 ```
+
+### Frontend Testing Interface
+
+A complete web-based testing interface is available in the `frontend/` directory:
+
+```bash
+# Navigate to frontend directory
+cd frontend/
+
+# Open index.html in your browser
+# Or serve with a simple HTTP server
+python -m http.server 8000
+# Then visit: http://localhost:8000
+```
+
+**Features:**
+- 🟢 **Health Check**: Test API connectivity
+- 🔐 **User Registration**: Create new accounts
+- 🔑 **User Login**: Authenticate and get JWT tokens
+- ✅ **Token Validation**: Verify JWT token validity
+- 🎨 **Responsive Design**: Works on desktop and mobile
+- 🟨 **Visual Feedback**: Color-coded success/error messages
 
 ## 🔒 Security Considerations
 
@@ -276,37 +350,25 @@ curl -X POST "http://localhost:8080/api/auth/validate?token=YOUR_TOKEN_HERE"
 
 ### Default Test Users
 
-The schema includes test users (remove in production):
+The schema includes test users for development:
 
-- **admin**: password `admin123`
-- **testuser1**: password `password123`
-- **testuser2**: password `password123`
+- **admin**: password `admin` (bcrypt hashed)
+- **testuser**: password `password` (bcrypt hashed)
+
+**Note**: Test users are automatically created via `schema.sql`
 
 ## 📊 Database Schema
 
 ### Credentials Table
 ```sql
 CREATE TABLE credentials (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(100) NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    username VARCHAR(50) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL
 );
 ```
 
-### Login Attempts Table (Optional Audit)
-```sql
-CREATE TABLE login_attempts (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL,
-    ip_address VARCHAR(45),
-    success BOOLEAN NOT NULL,
-    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    error_message TEXT
-);
-```
+**Simple and Efficient**: Direct JDBC implementation with minimal schema for optimal performance.
+
 
 ## 🚀 Deployment
 
@@ -367,11 +429,15 @@ For support and questions, please contact the development team or create an issu
 
 ## 🔄 Changelog
 
-### Version 0.0.1-SNAPSHOT
-- Initial release with JWT authentication
-- User registration and login
-- JPA integration with MySQL
-- Comprehensive error handling
-- Modern Spring Security configuration
-- Input validation and DTOs
-- Structured logging
+### Version 0.0.1-SNAPSHOT (Current)
+- ✅ **JWT Authentication**: Secure token-based auth with refresh tokens
+- ✅ **JDBC Integration**: Direct JDBC for optimal performance (replaced JPA)
+- ✅ **Docker MySQL Setup**: Containerized database with automated schema
+- ✅ **Hamachi VPN Support**: Secure team collaboration setup
+- ✅ **Frontend Testing Interface**: Complete web-based API testing
+- ✅ **Team Documentation**: VPN setup guides and checklists
+- ✅ **BCrypt Security**: Password hashing with strength 12
+- ✅ **Input Validation**: Comprehensive request validation
+- ✅ **Global Exception Handling**: Structured error responses
+- ✅ **Modern Spring Security**: Latest security configuration
+- ✅ **Docker Support**: Complete containerization setup
