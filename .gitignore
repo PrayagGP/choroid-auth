@@ -38,5 +38,7 @@ out/
 
 ### Security ###
 SECURE_CREDENTIALS_REFERENCE.md
+FINAL_SERVICE_REPORT.md
 *.credentials
 *.secrets
+*_REPORT.md
