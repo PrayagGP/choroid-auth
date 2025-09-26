@@ -42,3 +42,16 @@ FINAL_SERVICE_REPORT.md
 *.credentials
 *.secrets
 *_REPORT.md
+
+### Test and Debug Files ###
+*debug*.html
+*test*.html
+*.backup
+proxy_test.html
+debug_test.html
+app.html.backup
+
+### Runtime ###
+*.log
+node_modules/
+npm-debug.log*
