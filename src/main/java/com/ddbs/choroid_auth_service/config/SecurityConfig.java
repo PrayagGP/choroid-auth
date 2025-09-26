@@ -90,15 +90,33 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Allow specific origins or use allowedOriginPatterns for more flexibility
+        // Allow all origins for API gateway compatibility
         configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(List.of("*"));
+        
+        // Allow all HTTP methods
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
+        
+        // Allow all headers
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
+        
+        // Allow credentials for authentication
+        configuration.setAllowCredentials(false); // Changed to false for compatibility
+        
+        // Expose headers that might be needed
+        configuration.setExposedHeaders(List.of(
+            "Authorization", "Content-Type", "X-Requested-With", 
+            "Accept", "Origin", "Access-Control-Request-Method", 
+            "Access-Control-Request-Headers", "Access-Control-Allow-Origin"
+        ));
+        
+        // Set max age for preflight requests
+        configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        
+        log.info("CORS configuration: allowing all origins, methods, and headers");
         
         return source;
     }
