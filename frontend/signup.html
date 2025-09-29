@@ -245,145 +245,145 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:3001/api/auth';
+        //const API_BASE_URL = 'http://localhost:3001/api/auth';
+               const API_BASE_URL='/api/auth';
+               // Setup form handler
+               document.getElementById('signupForm').addEventListener('submit', handleSignup);
 
-        // Setup form handler
-        document.getElementById('signupForm').addEventListener('submit', handleSignup);
+               // Real-time password confirmation validation
+               document.getElementById('confirmPassword').addEventListener('input', checkPasswordMatch);
 
-        // Real-time password confirmation validation
-        document.getElementById('confirmPassword').addEventListener('input', checkPasswordMatch);
+               async function handleSignup(event) {
+                   event.preventDefault();
 
-        async function handleSignup(event) {
-            event.preventDefault();
-            
-            const signupButton = document.getElementById('signupButton');
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+                   const signupButton = document.getElementById('signupButton');
+                   const username = document.getElementById('username').value.trim();
+                   const password = document.getElementById('password').value;
+                   const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // Validation
-            if (!username || !password || !confirmPassword) {
-                showError('Please fill in all fields');
-                return;
-            }
+                   // Validation
+                   if (!username || !password || !confirmPassword) {
+                       showError('Please fill in all fields');
+                       return;
+                   }
 
-            if (password !== confirmPassword) {
-                showError('Passwords do not match');
-                return;
-            }
+                   if (password !== confirmPassword) {
+                       showError('Passwords do not match');
+                       return;
+                   }
 
-            if (username.length < 3 || username.length > 50) {
-                showError('Username must be between 3 and 50 characters');
-                return;
-            }
+                   if (username.length < 3 || username.length > 50) {
+                       showError('Username must be between 3 and 50 characters');
+                       return;
+                   }
 
-            if (password.length < 6) {
-                showError('Password must be at least 6 characters long');
-                return;
-            }
+                   if (password.length < 6) {
+                       showError('Password must be at least 6 characters long');
+                       return;
+                   }
 
-            // Check username format
-            const usernameRegex = /^[a-zA-Z0-9._-]+$/;
-            if (!usernameRegex.test(username)) {
-                showError('Username can only contain letters, numbers, dots, underscores, and hyphens');
-                return;
-            }
+                   // Check username format
+                   const usernameRegex = /^[a-zA-Z0-9._-]+$/;
+                   if (!usernameRegex.test(username)) {
+                       showError('Username can only contain letters, numbers, dots, underscores, and hyphens');
+                       return;
+                   }
 
-            // Show loading state
-            signupButton.classList.add('loading');
-            signupButton.disabled = true;
-            hideMessages();
+                   // Show loading state
+                   signupButton.classList.add('loading');
+                   signupButton.disabled = true;
+                   hideMessages();
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/signup`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
+                   try {
+                       const response = await fetch(`${API_BASE_URL}/signup`, {
+                           method: 'POST',
+                           headers: {
+                               'Content-Type': 'application/json'
+                           },
+                           body: JSON.stringify({ username, password })
+                       });
 
-                const data = await response.json();
+                       const data = await response.json();
 
-                if (response.ok) {
-                    showSuccess('Account created successfully! Redirecting to login...');
-                    
-                    // Clear the form
-                    document.getElementById('signupForm').reset();
-                    
-                    // Redirect to login after a brief delay
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                       if (response.ok) {
+                           showSuccess('Account created successfully! Redirecting to login...');
 
-                } else {
-                    // Handle different error types
-                    if (response.status === 409) {
-                        showError('Username already exists. Please choose a different username.');
-                    } else if (data.validationErrors) {
-                        // Handle validation errors
-                        const errorMessages = Object.values(data.validationErrors).join(', ');
-                        showError('Validation errors: ' + errorMessages);
-                    } else {
-                        showError(data.message || 'Registration failed. Please try again.');
-                    }
-                }
+                           // Clear the form
+                           document.getElementById('signupForm').reset();
 
-            } catch (error) {
-                console.error('Signup error:', error);
-                showError('Network error. Please check if the service is running.');
-            } finally {
-                // Remove loading state
-                signupButton.classList.remove('loading');
-                signupButton.disabled = false;
-            }
-        }
+                           // Redirect to login after a brief delay
+                           setTimeout(() => {
+                               window.location.href = 'login.html';
+                           }, 2000);
 
-        function checkPasswordMatch() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const confirmInput = document.getElementById('confirmPassword');
+                       } else {
+                           // Handle different error types
+                           if (response.status === 409) {
+                               showError('Username already exists. Please choose a different username.');
+                           } else if (data.validationErrors) {
+                               // Handle validation errors
+                               const errorMessages = Object.values(data.validationErrors).join(', ');
+                               showError('Validation errors: ' + errorMessages);
+                           } else {
+                               showError(data.message || 'Registration failed. Please try again.');
+                           }
+                       }
 
-            if (confirmPassword && password !== confirmPassword) {
-                confirmInput.style.borderColor = '#dc3545';
-            } else {
-                confirmInput.style.borderColor = '#e0e0e0';
-            }
-        }
+                   } catch (error) {
+                       console.error('Signup error:', error);
+                       showError('Network error. Please check if the service is running.');
+                   } finally {
+                       // Remove loading state
+                       signupButton.classList.remove('loading');
+                       signupButton.disabled = false;
+                   }
+               }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            
-            // Scroll to top to show error
-            window.scrollTo(0, 0);
-        }
+               function checkPasswordMatch() {
+                   const password = document.getElementById('password').value;
+                   const confirmPassword = document.getElementById('confirmPassword').value;
+                   const confirmInput = document.getElementById('confirmPassword');
 
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            
-            // Scroll to top to show success
-            window.scrollTo(0, 0);
-        }
+                   if (confirmPassword && password !== confirmPassword) {
+                       confirmInput.style.borderColor = '#dc3545';
+                   } else {
+                       confirmInput.style.borderColor = '#e0e0e0';
+                   }
+               }
 
-        function hideMessages() {
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
-        }
+               function showError(message) {
+                   const errorDiv = document.getElementById('errorMessage');
+                   errorDiv.textContent = message;
+                   errorDiv.style.display = 'block';
 
-        // Check if user is already logged in
-        window.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('jwt_token');
-            const username = localStorage.getItem('username');
-            
-            if (token && username) {
-                // User is already logged in, redirect to dashboard
-                window.location.href = `dashboard.html?user=${encodeURIComponent(username)}`;
-            }
-        });
+                   // Scroll to top to show error
+                   window.scrollTo(0, 0);
+               }
+
+               function showSuccess(message) {
+                   const successDiv = document.getElementById('successMessage');
+                   successDiv.textContent = message;
+                   successDiv.style.display = 'block';
+
+                   // Scroll to top to show success
+                   window.scrollTo(0, 0);
+               }
+
+               function hideMessages() {
+                   document.getElementById('errorMessage').style.display = 'none';
+                   document.getElementById('successMessage').style.display = 'none';
+               }
+
+               // Check if user is already logged in
+               window.addEventListener('DOMContentLoaded', function() {
+                   const token = localStorage.getItem('jwt_token');
+                   const username = localStorage.getItem('username');
+
+                   if (token && username) {
+                       // User is already logged in, redirect to dashboard
+                       window.location.href = `dashboard.html?user=${encodeURIComponent(username)}`;
+                   }
+               });
     </script>
 </body>
 </html>

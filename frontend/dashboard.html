@@ -407,7 +407,7 @@
             // Update UI with user information
             updateUserInterface(username);
             displayTokens();
-            
+
             // Validate token in background
             await validateCurrentSession();
         }
@@ -428,11 +428,11 @@
         function updateUserInterface(username) {
             // Update welcome text
             document.getElementById('welcomeText').textContent = `Welcome, ${username}!`;
-            
+
             // Update user avatar with first letter of username
             const avatar = document.getElementById('userAvatar');
             avatar.textContent = username.charAt(0).toUpperCase();
-            
+
             // Update page title
             document.title = `Dashboard - ${username}`;
         }
@@ -470,14 +470,14 @@
 
         function updateAuthStatus(isValid, message) {
             const statusEl = document.getElementById('authStatus');
-            
+
             if (isValid) {
                 statusEl.className = 'status-indicator status-valid';
                 statusEl.textContent = '✅ Authenticated & Token Valid';
             } else {
                 statusEl.className = 'status-indicator status-invalid';
                 statusEl.textContent = '❌ Session Invalid or Expired';
-                
+
                 // If token is invalid, redirect to login after a delay
                 setTimeout(() => {
                     logout();
@@ -498,7 +498,7 @@
                 });
 
                 const data = await response.json();
-                
+
                 if (data.valid) {
                     alert(`✅ Token is valid!\nUsername: ${data.username}\nMessage: ${data.message}`);
                 } else {
@@ -547,9 +547,9 @@
                 });
 
                 const data = await response.json();
-                
+
                 const result = `Authentication Test Results:
-                
+
 ✅ Service Status: Connected
 🎫 Token Status: ${data.valid ? 'Valid' : 'Invalid'}
 👤 Username: ${data.username || 'N/A'}
@@ -566,7 +566,7 @@
         function viewProfile() {
             const username = getUsername();
             const token = getToken();
-            
+
             const profileInfo = `User Profile Information:
 
 👤 Username: ${username}

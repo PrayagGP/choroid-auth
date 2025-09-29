@@ -159,4 +159,59 @@ public class AuthService {
             return null;
         }
     }
+    
+    /**
+     * Update user password
+     * @param username the username
+     * @param currentPassword the current password
+     * @param newPassword the new password
+     * @throws InvalidCredentialsException if current password is incorrect
+     */
+    public void updatePassword(String username, String currentPassword, String newPassword) {
+        log.info("Password update attempt for username: {}", username);
+        
+        // Input validation
+        if (!StringUtils.hasText(username) || !StringUtils.hasText(currentPassword) || !StringUtils.hasText(newPassword)) {
+            log.warn("Password update failed: empty parameters");
+            throw new IllegalArgumentException("Username, current password, and new password are required");
+        }
+        
+        if (newPassword.length() < 6) {
+            log.warn("Password update failed: new password too short for user: {}", username);
+            throw new IllegalArgumentException("New password must be at least 6 characters long");
+        }
+        
+        try {
+            // Verify user exists and current password is correct
+            Optional<Credentials> credentialsOpt = credentialsRepository.findById(username);
+            
+            if (credentialsOpt.isEmpty()) {
+                log.warn("Password update failed: user not found: {}", username);
+                throw new InvalidCredentialsException("User not found");
+            }
+            
+            Credentials credentials = credentialsOpt.get();
+            
+            if (!passwordEncoder.matches(currentPassword, credentials.getPassword())) {
+                log.warn("Password update failed: current password incorrect for user: {}", username);
+                throw new InvalidCredentialsException("Current password is incorrect");
+            }
+            
+            // Update password
+            Credentials updatedCredentials = new Credentials(
+                    username, 
+                    passwordEncoder.encode(newPassword)
+            );
+            
+            credentialsRepository.save(updatedCredentials);
+            log.info("Password updated successfully for user: {}", username);
+            
+        } catch (Exception e) {
+            if (e instanceof InvalidCredentialsException || e instanceof IllegalArgumentException) {
+                throw e;
+            }
+            log.error("Unexpected error during password update for user: {}", username, e);
+            throw new RuntimeException("Password update failed. Please try again.");
+        }
+    }
 }

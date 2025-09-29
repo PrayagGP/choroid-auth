@@ -3,6 +3,7 @@ package com.ddbs.choroid_auth_service.controller;
 import com.ddbs.choroid_auth_service.dto.AuthResponse;
 import com.ddbs.choroid_auth_service.dto.LoginRequest;
 import com.ddbs.choroid_auth_service.dto.SignupRequest;
+import com.ddbs.choroid_auth_service.dto.UpdatePasswordRequest;
 import com.ddbs.choroid_auth_service.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -109,6 +110,39 @@ public class AuthController {
             response.put("message", "Token validation failed");
         }
         
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Update password endpoint
+     * @param updatePasswordRequest Update password credentials
+     * @return Success message
+     */
+    @PostMapping("/update-password")
+    public ResponseEntity<Map<String, String>> updatePassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        log.info("Password update request received for username: {}", updatePasswordRequest.getUsername());
+        
+        // Validate that new password and confirm password match
+        if (!updatePasswordRequest.getNewPassword().equals(updatePasswordRequest.getConfirmPassword())) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Password confirmation mismatch");
+            errorResponse.put("message", "New password and confirm password do not match");
+            errorResponse.put("timestamp", LocalDateTime.now().toString());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+        
+        authService.updatePassword(
+                updatePasswordRequest.getUsername(),
+                updatePasswordRequest.getCurrentPassword(),
+                updatePasswordRequest.getNewPassword()
+        );
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Password updated successfully");
+        response.put("username", updatePasswordRequest.getUsername());
+        response.put("timestamp", LocalDateTime.now().toString());
+        
+        log.info("Password update successful for username: {}", updatePasswordRequest.getUsername());
         return ResponseEntity.ok(response);
     }
     

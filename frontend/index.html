@@ -404,7 +404,7 @@
                 logMessage('🔍 Checking service health...', 'info');
                 const response = await fetch(`${API_BASE_URL}/health`);
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     document.getElementById('service-status').className = 'status-indicator status-online';
                     document.getElementById('service-text').textContent = 'Service Online';
@@ -437,7 +437,7 @@
         async function performLogin(credentials) {
             try {
                 logMessage(`🔑 Attempting login for user: ${credentials.username}`, 'info');
-                
+
                 const response = await fetch(`${API_BASE_URL}/login`, {
                     method: 'POST',
                     headers: {
@@ -451,12 +451,12 @@
                 if (response.ok) {
                     logMessage('✅ Login successful!', 'success');
                     logMessage(JSON.stringify(data, null, 2), 'success');
-                    
+
                     // Store tokens
                     currentTokens.accessToken = data.token;
                     currentTokens.refreshToken = data.refreshToken;
                     currentTokens.username = data.username;
-                    
+
                     displayTokens();
                     clearForm('loginForm');
                 } else {
@@ -485,7 +485,7 @@
         async function performSignup(userData) {
             try {
                 logMessage(`📝 Attempting signup for user: ${userData.username}`, 'info');
-                
+
                 const response = await fetch(`${API_BASE_URL}/signup`, {
                     method: 'POST',
                     headers: {
@@ -518,13 +518,13 @@
 
             try {
                 logMessage('🎫 Testing token validation...', 'info');
-                
+
                 const response = await fetch(`${API_BASE_URL}/validate?token=${encodeURIComponent(currentTokens.accessToken)}`, {
                     method: 'POST'
                 });
 
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     logMessage('✅ Token validation successful!', 'success');
                     logMessage(JSON.stringify(data, null, 2), 'success');
@@ -543,7 +543,7 @@
                 username: 'nonexistentuser',
                 password: 'wrongpassword'
             };
-            
+
             logMessage('🧪 Testing invalid credentials...', 'info');
             await performLogin(invalidCreds);
         }
@@ -554,7 +554,7 @@
                 username: 'admin',
                 password: 'newpassword123'
             };
-            
+
             logMessage('🧪 Testing duplicate user signup...', 'info');
             await performSignup(duplicateUser);
         }
@@ -600,7 +600,7 @@
             const log = document.getElementById('responseLog');
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = `[${timestamp}] ${message}\n`;
-            
+
             log.textContent += logEntry;
             log.className = `response-box ${type}`;
             log.scrollTop = log.scrollHeight;
@@ -637,7 +637,7 @@ POST /api/auth/signup
 - Body: {"username": "string", "password": "string"}
 - Response: 201 Created or 409 Conflict
 
-POST /api/auth/login  
+POST /api/auth/login
 - Body: {"username": "string", "password": "string"}
 - Response: 200 OK with JWT tokens or 401 Unauthorized
 

@@ -80,7 +80,7 @@
 
                 // Validate the token with the server
                 const isValid = await validateTokenWithServer(token);
-                
+
                 if (isValid) {
                     console.log('Valid token found, redirecting to dashboard');
                     redirectToDashboard(username, token);
@@ -110,7 +110,7 @@
                     const data = await response.json();
                     return data.valid === true;
                 }
-                
+
                 return false;
             } catch (error) {
                 console.error('Token validation failed:', error);
@@ -129,7 +129,7 @@
             // Store the validated credentials for the dashboard
             localStorage.setItem('jwt_token', token);
             localStorage.setItem('username', username);
-            
+
             // Add a small delay for better UX
             setTimeout(() => {
                 window.location.href = `dashboard.html?user=${encodeURIComponent(username)}`;

@@ -49,6 +49,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        // adding for remote access: allow unauthenticated access to static frontend files
+                        .requestMatchers("/frontend/**").permitAll() // adding for remote access
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions
@@ -121,4 +123,3 @@ public class SecurityConfig {
         return source;
     }
 }
-
