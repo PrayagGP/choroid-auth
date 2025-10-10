@@ -387,8 +387,14 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:3001/api/auth';
-
+ // Smart API URL detection - Check if accessed via gateway port or proxy port
+ const isDirectGateway = window.location.port === '8080' || window.location.port === '';
+ const API_BASE_URL = isDirectGateway ? '/api/auth' : 'http://localhost:3001/api/auth';
+ 
+ console.log('Current URL:', window.location.href);
+ console.log('Port:', window.location.port);
+ console.log('Access method:', isDirectGateway ? 'Direct Gateway (Port 8080)' : 'Local Proxy/File');
+ console.log('API Base URL:', API_BASE_URL);
         // Initialize dashboard on page load
         window.addEventListener('DOMContentLoaded', function() {
             initializeDashboard();
@@ -581,12 +587,17 @@
         function openTestInterface() {
             window.open('index.html', '_blank');
         }
-
+function deleteCookie(name) {
+            document.cookie = name + "=; Expires=Thu, 01 Feb 1983 00:00:00 GMT; Path=/;";
+        }
         function logout() {
             // Clear all authentication data
             localStorage.removeItem('jwt_token');
             localStorage.removeItem('username');
             localStorage.removeItem('refresh_token');
+            deleteCookie('jwtToken');
+            deleteCookie('username');
+
 
             // Redirect to login
             alert('You have been signed out successfully.');

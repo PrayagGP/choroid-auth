@@ -5,6 +5,8 @@ import com.ddbs.choroid_auth_service.dto.LoginRequest;
 import com.ddbs.choroid_auth_service.dto.SignupRequest;
 import com.ddbs.choroid_auth_service.dto.UpdatePasswordRequest;
 import com.ddbs.choroid_auth_service.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +40,7 @@ public class AuthController {
      * @return Authentication response with JWT token
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse httpResponse) {
         log.info("Login request received for username: {}", loginRequest.getUsername());
         
         String token = authService.authenticate(loginRequest.getUsername(), loginRequest.getPassword());
@@ -55,7 +57,25 @@ public class AuthController {
                 .expiresAt(expiresAt)
                 .message("Login successful")
                 .build();
+
+        // Set JWT cookie for gateway access
+        Cookie jwtCookie = new Cookie("jwtToken", token);
+        jwtCookie.setHttpOnly(false);  // Allow JavaScript access for debugging
+        jwtCookie.setSecure(false);    // HTTP for development
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(3600);     // 1 hour
+        jwtCookie.setAttribute("SameSite", "Lax");  // Better for same-site requests
         
+        // Set username cookie for easy gateway access
+        Cookie usernameCookie = new Cookie("username", loginRequest.getUsername());
+        usernameCookie.setHttpOnly(false);
+        usernameCookie.setSecure(false);
+        usernameCookie.setPath("/");
+        usernameCookie.setMaxAge(3600);
+        usernameCookie.setAttribute("SameSite", "Lax");
+
+        httpResponse.addCookie(jwtCookie);
+        httpResponse.addCookie(usernameCookie);
         log.info("Login successful for username: {}", loginRequest.getUsername());
         return ResponseEntity.ok(response);
     }

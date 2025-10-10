@@ -2,6 +2,7 @@ package com.ddbs.choroid_auth_service.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +35,16 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            // Allow top-level static html pages
+            "/",
+            "/*.html",
+            "/favicon.ico",
+            // Common static resource locations when served from classpath:/static/**
+            "/assets/**",
+            "/css/**",
+            "/js/**",
+            "/images/**"
     };
 
     @Bean
@@ -48,9 +58,12 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authz -> authz
+                        // Permit Spring Boot's common static resource locations
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        // Permit our known public endpoints and top-level html pages
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        // adding for remote access: allow unauthenticated access to static frontend files
-                        .requestMatchers("/frontend/**").permitAll() // adding for remote access
+                        // Backward-compat: if serving from a folder mapping
+                        .requestMatchers("/frontend/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions

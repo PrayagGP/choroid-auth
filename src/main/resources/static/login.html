@@ -271,7 +271,15 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:3001/api/auth';
+        // Smart API URL detection - Check if accessed via gateway port or proxy port
+        const isDirectGateway = window.location.port === '8080' || window.location.port === '';
+        const isProxyAccess = window.location.port === '3001' || window.location.hostname === 'file';
+        const API_BASE_URL = isDirectGateway ? '/api/auth' : 'http://localhost:3001/api/auth';
+        
+        console.log('Current URL:', window.location.href);
+        console.log('Port:', window.location.port);
+        console.log('Access method:', isDirectGateway ? 'Direct Gateway (Port 8080)' : 'Local Proxy/File');
+        console.log('API Base URL:', API_BASE_URL);
 
         // Setup form handler
         document.getElementById('loginForm').addEventListener('submit', handleLogin);
@@ -312,9 +320,9 @@
 
                     showSuccess('Login successful! Redirecting...');
                     
-                    // Redirect to dashboard after a brief delay
-                    setTimeout(() => {
-                        window.location.href = `dashboard.html?user=${encodeURIComponent(data.username)}`;
+                    // Check user profile and redirect accordingly
+                    setTimeout(async () => {
+                        await checkUserProfileAndRedirect(data.username);
                     }, 1500);
 
                 } else {
@@ -355,6 +363,49 @@
         function hideMessages() {
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // Check if user profile exists and redirect accordingly
+        async function checkUserProfileAndRedirect(username) {
+            try {
+                console.log(`Checking user profile for: ${username}`);
+                
+                // Always use gateway for user service (friend's system)
+                const profileCheckUrl = `/users/api/checkusername/${encodeURIComponent(username)}`;
+                
+                const profileResponse = await fetch(profileCheckUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (profileResponse.ok) {
+                    const profileData = await profileResponse.json();
+                    console.log('Profile check result:', profileData);
+                    
+                    // If user exists in users table, go to dashboard
+                    if (profileData === true || profileData.exists === true) {
+                        console.log('User profile exists, redirecting to dashboard');
+                        window.location.href = `dashboard.html?user=${encodeURIComponent(username)}`;
+                    } else {
+                        // User doesn't exist, redirect to create profile via gateway
+                        console.log('User profile not found, redirecting to create profile');
+                        const token = profileResponse.headers.get('Authorization') || profileResponse.json().token;
+                        localStorage.setItem('jwtToken', token);
+                        window.location.href = `/users/create`;
+                    }
+                } else {
+                    console.error('Profile check failed:', profileResponse.status);
+                    // Fallback to dashboard if profile check fails
+                    window.location.href = `dashboard.html?user=${encodeURIComponent(username)}`;
+                }
+                
+            } catch (error) {
+                console.error('Error checking user profile:', error);
+                // Fallback to dashboard if there's an error
+                window.location.href = `dashboard.html?user=${encodeURIComponent(username)}`;
+            }
         }
 
         // Check if user is already logged in
