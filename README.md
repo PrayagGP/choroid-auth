@@ -4,15 +4,25 @@ A secure, modern Spring Boot microservice providing JWT-based authentication and
 
 ## 🚀 Features
 
+### **Authentication & Security**
 - **JWT Authentication**: Secure token-based authentication with refresh tokens
+- **Cookie Integration**: Automatic JWT cookie storage for gateway compatibility
 - **User Registration**: Secure user signup with password hashing (BCrypt)
 - **Input Validation**: Comprehensive request validation with detailed error messages
 - **Modern Security**: Latest Spring Security 6+ with proper configuration
+
+### **Architecture & Integration**
+- **Unified Deployment**: Frontend and backend served from single Spring Boot JAR
+- **Gateway-Ready**: Cookie-based auth for seamless API gateway integration
+- **Database Integration**: Direct JDBC with MySQL support (lightweight and performant)
+- **Static Resource Serving**: Built-in web interface via Spring Boot static resources
 - **Error Handling**: Global exception handling with structured error responses
-- **Database Integration**: JDBC with MySQL support (lightweight and performant)
+
+### **Development & Operations**
+- **Environment Configuration**: Externalized configuration for different environments
 - **Logging**: Structured logging with SLF4J
 - **API Documentation**: RESTful API design with proper DTOs
-- **Environment Configuration**: Externalized configuration for different environments
+- **Team Collaboration**: Hamachi VPN support for secure database sharing
 
 ## 📋 Prerequisites
 
@@ -97,6 +107,13 @@ java -jar build/libs/choroid-auth-service-0.0.1-SNAPSHOT.jar
 
 The service will start on `http://localhost:8081`
 
+**🌐 Access the Web Interface:**
+- **Main Page**: http://localhost:8081/
+- **Login**: http://localhost:8081/login.html
+- **Sign Up**: http://localhost:8081/signup.html  
+- **Dashboard**: http://localhost:8081/dashboard.html
+- **API Health**: http://localhost:8081/api/auth/health
+
 ## 🤝 Team Collaboration Setup
 
 This project supports secure team development using **Hamachi VPN** for database sharing.
@@ -132,6 +149,33 @@ This project supports secure team development using **Hamachi VPN** for database
 - ✅ **Encrypted VPN tunnel**
 - ✅ **Database not exposed** to public internet
 - ✅ **Access control** via VPN network membership
+
+## 🔗 Gateway Integration
+
+The service now provides **cookie-based authentication** for seamless API gateway integration:
+
+### **Cookie Features**
+- **JWT Token Cookie**: Automatically set on successful login (`jwtToken`)
+- **Username Cookie**: User identification for gateway routing (`username`)
+- **Gateway-Friendly**: 1-hour expiration, Lax SameSite policy
+- **Development-Ready**: HTTP cookies for local development (configure HTTPS for production)
+
+### **Gateway Configuration Example**
+```properties
+# Example gateway configuration (see gateway-multi-service-example.properties)
+spring.cloud.gateway.routes[0].id=auth-service
+spring.cloud.gateway.routes[0].uri=http://localhost:8081
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/auth/**
+
+# Other microservices can read JWT from cookies
+spring.cloud.gateway.routes[1].filters[0]=SetRequestHeader=Authorization, Bearer {cookie:jwtToken}
+```
+
+### **Frontend Integration**
+Frontend applications can now:
+- Access JWT tokens via cookies (no manual token management)
+- Make authenticated requests through the gateway
+- Benefit from automatic cookie handling by browsers
 
 ## 📋 API Documentation
 
@@ -315,17 +359,24 @@ curl -X POST "http://localhost:8081/api/auth/validate?token=YOUR_TOKEN_HERE"
 
 ### Frontend Testing Interface
 
-A complete web-based testing interface is available in the `frontend/` directory:
+A complete web-based testing interface is now **built into the Spring Boot application**. No external server needed!
 
 ```bash
-# Navigate to frontend directory
-cd frontend/
+# Start the auth service
+./gradlew bootRun
 
-# Open index.html in your browser
-# Or serve with a simple HTTP server
-python -m http.server 8000
-# Then visit: http://localhost:8000
+# Access the frontend directly through Spring Boot
+http://localhost:8081/
+http://localhost:8081/login.html
+http://localhost:8081/signup.html
+http://localhost:8081/dashboard.html
 ```
+
+**🚀 New Integration Features:**
+- **Cookie-based Authentication**: JWT tokens automatically stored as HTTP cookies
+- **Gateway-Ready**: Seamless integration with API gateways
+- **No CORS Issues**: Frontend and backend served from same origin
+- **Simplified Deployment**: Single JAR contains both API and UI
 
 **Features:**
 - 🟢 **Health Check**: Test API connectivity
@@ -429,15 +480,29 @@ For support and questions, please contact the development team or create an issu
 
 ## 🔄 Changelog
 
-### Version 0.0.1-SNAPSHOT (Current)
+### Version 0.0.1-SNAPSHOT (Current) - 🎆 **Major Architecture Update**
+
+#### **🚀 New Features (Latest)**
+- ✅ **Frontend Migration**: Moved HTML files to Spring Boot static resources (`src/main/resources/static/`)
+- ✅ **Cookie-Based Authentication**: JWT tokens automatically stored as HTTP cookies
+- ✅ **Gateway Integration**: Ready for API gateway with cookie-based auth
+- ✅ **Unified Deployment**: Single JAR now serves both API and web interface
+- ✅ **Enhanced Security Config**: Improved static resource serving configuration
+- ✅ **Gateway Example Config**: Template configuration for Spring Cloud Gateway
+
+#### **🏠 Core Features**
 - ✅ **JWT Authentication**: Secure token-based auth with refresh tokens
 - ✅ **JDBC Integration**: Direct JDBC for optimal performance (replaced JPA)
 - ✅ **Docker MySQL Setup**: Containerized database with automated schema
 - ✅ **Hamachi VPN Support**: Secure team collaboration setup
-- ✅ **Frontend Testing Interface**: Complete web-based API testing
-- ✅ **Team Documentation**: VPN setup guides and checklists
 - ✅ **BCrypt Security**: Password hashing with strength 12
 - ✅ **Input Validation**: Comprehensive request validation
 - ✅ **Global Exception Handling**: Structured error responses
 - ✅ **Modern Spring Security**: Latest security configuration
 - ✅ **Docker Support**: Complete containerization setup
+
+#### **🛠️ Architecture Improvements**
+- **No External Web Server Needed**: Frontend now served directly by Spring Boot
+- **CORS-Free Development**: Frontend and backend on same origin
+- **Microservice-Ready**: Cookie-based auth perfect for gateway architectures
+- **Simplified Deployment**: One JAR to deploy instead of separate frontend/backend
