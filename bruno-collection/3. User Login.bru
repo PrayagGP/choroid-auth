@@ -1,0 +1,79 @@
+meta {
+  name: 3. User Login
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "testuser123",
+    "password": "securePass123"
+  }
+}
+
+script:post-response {
+  if (res.status === 200) {
+    const data = res.body;
+    bru.setEnvVar("token", data.token);
+    bru.setEnvVar("refreshToken", data.refreshToken);
+    bru.setEnvVar("username", data.username);
+    console.log("✅ Login successful! Token saved to environment.");
+    console.log("Token:", data.token.substring(0, 50) + "...");
+  }
+}
+
+docs {
+  # User Login Endpoint
+  
+  **Purpose**: Authenticate user and receive JWT tokens
+  
+  **Request Body**:
+  - `username`: Registered username
+  - `password`: User's password
+  
+  **Success Response (200 OK)**:
+  ```json
+  {
+    "token": "eyJhbGciOiJIUzI1NiJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiJ9...",
+    "username": "testuser123",
+    "issuedAt": "2025-01-12T12:00:00",
+    "expiresAt": "2025-01-13T12:00:00",
+    "message": "Login successful"
+  }
+  ```
+  
+  **Cookies Set**:
+  - `jwtToken`: JWT access token (1 hour expiration)
+  - `username`: Username for gateway routing
+  
+  **Error Response (401 Unauthorized)** - Invalid credentials:
+  ```json
+  {
+    "timestamp": "2025-01-12T12:00:00",
+    "status": 401,
+    "error": "Unauthorized",
+    "message": "Invalid username or password",
+    "path": "/api/auth/login"
+  }
+  ```
+  
+  **Post-Response Script**:
+  This request automatically saves the JWT token, refresh token, and username to environment variables for use in subsequent requests.
+  
+  **Test Instructions**:
+  1. First create a user using the Signup endpoint
+  2. Use the same credentials here to login
+  3. Check the "Console" tab to see the saved token
+  4. The token is now available as `{{token}}` in other requests
+}

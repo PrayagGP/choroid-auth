@@ -185,7 +185,7 @@ Updated all frontend files to use the local CORS proxy instead of direct API gat
 
 #### **Before (Direct Gateway Access):**
 ```javascript
-const API_BASE_URL = 'http://25.7.141.58:8080/api/auth';
+const API_BASE_URL = 'http://25.7.141.58:8100/api/auth';
 ```
 
 #### **After (Via CORS Proxy):**

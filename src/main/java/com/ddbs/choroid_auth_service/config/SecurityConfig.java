@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import com.ddbs.choroid_auth_service.security.JwtAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 
@@ -48,7 +50,7 @@ public class SecurityConfig {
     };
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         log.info("Configuring security filter chain");
         
         http
@@ -83,7 +85,8 @@ public class SecurityConfig {
                                     "{\"error\":\"Forbidden\",\"message\":\"Access denied\"}"
                             );
                         })
-                );
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

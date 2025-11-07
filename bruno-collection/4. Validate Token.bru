@@ -1,0 +1,57 @@
+meta {
+  name: 4. Validate Token
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/auth/validate?token={{token}}
+  body: none
+  auth: none
+}
+
+docs {
+  # Token Validation Endpoint
+  
+  **Purpose**: Verify if a JWT token is valid and not expired
+  
+  **Query Parameters**:
+  - `token`: The JWT token to validate (automatically populated from environment)
+  
+  **Success Response (200 OK)** - Valid token:
+  ```json
+  {
+    "valid": true,
+    "username": "testuser123",
+    "message": "Token is valid"
+  }
+  ```
+  
+  **Response - Invalid/Expired token**:
+  ```json
+  {
+    "valid": false,
+    "username": null,
+    "message": "Token is invalid or expired"
+  }
+  ```
+  
+  **Response - Malformed token**:
+  ```json
+  {
+    "valid": false,
+    "username": null,
+    "message": "Invalid token format"
+  }
+  ```
+  
+  **Test Instructions**:
+  1. Run the "User Login" request first to obtain a token
+  2. The token from environment variable `{{token}}` will be used automatically
+  3. To test with an expired token, wait for the token to expire (default: 24 hours)
+  4. To test with an invalid token, manually modify the token parameter
+  
+  **Use Case**:
+  - API gateways can use this endpoint to validate tokens before routing requests
+  - Frontend can verify token validity before making authenticated requests
+}

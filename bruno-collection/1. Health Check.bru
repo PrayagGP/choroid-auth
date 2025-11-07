@@ -1,0 +1,28 @@
+meta {
+  name: 1. Health Check
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/auth/health
+  body: none
+  auth: none
+}
+
+docs {
+  # Health Check Endpoint
+  
+  **Purpose**: Verify that the authentication service is running
+  
+  **Expected Response**:
+  ```json
+  {
+    "status": "UP",
+    "service": "Choroid Authentication Service",
+    "timestamp": "2025-01-12T12:00:00"
+  }
+  ```
+  
+  **Usage**: Run this first to ensure the service is accessible before testing other endpoints.
+}

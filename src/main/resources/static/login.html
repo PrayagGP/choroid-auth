@@ -272,13 +272,13 @@
 
     <script>
         // Smart API URL detection - Check if accessed via gateway port or proxy port
-        const isDirectGateway = window.location.port === '8080' || window.location.port === '';
+        const isDirectGateway = window.location.port === '8100' || window.location.port === '8080' || window.location.port === '';
         const isProxyAccess = window.location.port === '3001' || window.location.hostname === 'file';
-        const API_BASE_URL = isDirectGateway ? '/api/auth' : 'http://localhost:3001/api/auth';
+        const API_BASE_URL = isDirectGateway ? '/api/auth' : 'http://localhost:8080/api/auth';
         
         console.log('Current URL:', window.location.href);
         console.log('Port:', window.location.port);
-        console.log('Access method:', isDirectGateway ? 'Direct Gateway (Port 8080)' : 'Local Proxy/File');
+        console.log('Access method:', isDirectGateway ? 'Direct Gateway (Port 8100)' : 'Local Proxy/File');
         console.log('API Base URL:', API_BASE_URL);
 
         // Setup form handler
@@ -314,9 +314,9 @@
 
                 if (response.ok) {
                     // Store authentication data
-                    localStorage.setItem('jwt_token', data.token);
+                    localStorage.setItem('jwtToken', data.token);
                     localStorage.setItem('username', data.username);
-                    localStorage.setItem('refresh_token', data.refreshToken);
+                    localStorage.setItem('refreshToken', data.refreshToken);
 
                     showSuccess('Login successful! Redirecting...');
                     
@@ -372,11 +372,13 @@
                 
                 // Always use gateway for user service (friend's system)
                 const profileCheckUrl = `/users/api/checkusername/${encodeURIComponent(username)}`;
+                const token = localStorage.getItem('jwtToken');
                 
                 const profileResponse = await fetch(profileCheckUrl, {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 
@@ -391,9 +393,8 @@
                     } else {
                         // User doesn't exist, redirect to create profile via gateway
                         console.log('User profile not found, redirecting to create profile');
-                        const token = profileResponse.headers.get('Authorization') || profileResponse.json().token;
-                        localStorage.setItem('jwtToken', token);
-                        window.location.href = `/users/create`;
+                        // Pass token via URL to preserve it across redirect
+                        window.location.href = `/users/create?token=${encodeURIComponent(token)}`;
                     }
                 } else {
                     console.error('Profile check failed:', profileResponse.status);
@@ -410,12 +411,12 @@
 
         // Check if user is already logged in
         window.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('jwt_token');
+            const token = localStorage.getItem('jwtToken');
             const username = localStorage.getItem('username');
             
             if (token && username) {
-                // User might already be logged in, redirect to app.html to verify
-                window.location.href = 'app.html';
+                // User might already be logged in, redirect to dashboard directly
+                window.location.href = 'dashboard.html?user=' + encodeURIComponent(username);
             }
         });
     </script>

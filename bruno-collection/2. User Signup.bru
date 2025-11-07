@@ -1,0 +1,72 @@
+meta {
+  name: 2. User Signup
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/auth/signup
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "testuser123",
+    "password": "securePass123"
+  }
+}
+
+docs {
+  # User Signup Endpoint
+  
+  **Purpose**: Register a new user account
+  
+  **Request Body**:
+  - `username`: 3-50 characters, alphanumeric with dots, underscores, hyphens
+  - `password`: 6-100 characters minimum
+  
+  **Success Response (201 Created)**:
+  ```json
+  {
+    "message": "User registered successfully",
+    "username": "testuser123",
+    "timestamp": "2025-01-12T12:00:00"
+  }
+  ```
+  
+  **Error Response (409 Conflict)** - User already exists:
+  ```json
+  {
+    "timestamp": "2025-01-12T12:00:00",
+    "status": 409,
+    "error": "Conflict",
+    "message": "Username 'testuser123' is already taken",
+    "path": "/api/auth/signup"
+  }
+  ```
+  
+  **Error Response (400 Bad Request)** - Validation failed:
+  ```json
+  {
+    "timestamp": "2025-01-12T12:00:00",
+    "status": 400,
+    "error": "Validation Failed",
+    "message": "Input validation failed",
+    "path": "/api/auth/signup",
+    "validationErrors": {
+      "username": "Username must be between 3 and 50 characters",
+      "password": "Password must be at least 6 characters long"
+    }
+  }
+  ```
+  
+  **Test Instructions**:
+  1. Modify the username in the request body to create unique users
+  2. Ensure password meets minimum 6 character requirement
+  3. Username can only contain letters, numbers, dots, underscores, and hyphens
+}

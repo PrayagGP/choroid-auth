@@ -3,7 +3,7 @@ const https = require('https');
 const url = require('url');
 
 const PORT = 3001;
-const TARGET_HOST = '25.7.141.58:8080';
+const TARGET_HOST = '25.7.141.58:8100';
 
 // Create proxy server
 const server = http.createServer((req, res) => {
